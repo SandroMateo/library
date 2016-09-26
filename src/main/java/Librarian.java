@@ -34,11 +34,13 @@ public class Librarian{
   }
 
   public void save(){
-    try(Connection con = sql2o.open()){
-      String sql = "INSERT INTO librarians ";
+    try(Connection con = DB.sql2o.open()){
+      String sql = "INSERT INTO librarians (username, password, name) VALUES(:username, :password, :name)";
       this.id = (int) createQuery(sql, true)
-        
-        .executeUpdate();
+        .addParameter("username", this.username)
+        .addParameter("password", this.password)
+        .addParameter("name", this.name)
+        .executeUpdate()
         .getKey();
     }
   }
