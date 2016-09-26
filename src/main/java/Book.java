@@ -17,4 +17,33 @@ public class Book{
     this.name = name;
   }
 
+  public int getId(){
+    return id;
+  }
+
+  public String getTitle(){
+    return title;
+  }
+
+  public String getAuthor(){
+    return author;
+  }
+
+  public String getPatronId(){
+    return patronId;
+  }
+
+  public String getCheckoutDate(){
+    return checkoutDate;
+  }
+
+  public String getDueDate(){
+    return dueDate;
+  }
+
+  public String getRenewals(){
+    return renewals;
+  }
+
+
 }

@@ -15,4 +15,24 @@ public class Patron{
     this.name = name;
   }
 
+  public int getId(){
+    return id;
+  }
+
+  public String getUsername(){
+    return username;
+  }
+
+  public String getPassword(){
+    return password;
+  }
+
+  public String getName(){
+    return name;
+  }
+
+  public String getCheckedBooks(){
+    return checkedBooks;
+  }
+
 }
