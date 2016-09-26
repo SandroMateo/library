@@ -82,6 +82,35 @@ public class Book{
     }
   }
 
+  public void checkout(int patronId) {
+    Patron.find(patronId).updateCheckedBooks();
+    try(Connection con = DB.sql2o.open()) {
+      String sql1 = "UPDATE books SET patronId = :patronId, checkoutDate = now() WHERE id = :id";
+      String sql2 = "UPDATE books SET dueDate = (checkoutDate + INTERVAL '60 days') WHERE id = :id";
+      con.createQuery(sql1)
+        .addParameter("patronId", patronId)
+        .addParameter("id", this.id)
+        .executeUpdate();
+      con.createQuery(sql2)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
+  public void renew() {
+    if(renewals >= Book.MAX_RENEWALS) {
+      throw new UnsupportedOperationException("You have no renewals left. RETURN THIS BOOK");
+    }
+    this.renewals++;
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE books SET renewals = :renewals WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("renewals", this.renewals)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
   @Override
   public boolean equals(Object otherBook){
     if(!(otherBook instanceof Book)) {
