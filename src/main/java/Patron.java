@@ -146,6 +146,15 @@ public class Patron {
     }
   }
 
+  public List<Integer> getBookHistory() {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "SELECT * FROM histories WHERE patronid = :id";
+      return con.createQuery(sql)
+        .addParameter("id", this.id)
+        .executeAndFetch(Integer.class);
+    }
+  }
+
   @Override
   public boolean equals(Object otherPatron) {
     if(!(otherPatron instanceof Patron)) {

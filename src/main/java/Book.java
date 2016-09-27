@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.time.Instant;
 
 public class Book{
   private int id;
@@ -61,6 +62,26 @@ public class Book{
     }
   }
 
+  public void updateTitle(String title) {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE patrons SET title = :title WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("title", title)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
+  public void updateAuthor(String author) {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE patrons SET author = :author WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("author", author)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
   public void delete(){
     try(Connection con = DB.sql2o.open()){
       String sql = "DELETE FROM books WHERE id=:id";
@@ -89,6 +110,8 @@ public class Book{
 
   public void checkout(int patronId) {
     Patron.find(patronId).checkoutBook();
+    checkoutDate = new Timestamp(new Date().getTime());
+    dueDate = new Timestamp(checkoutDate.setTime(checkoutDate + (60 * 24 * 60 * 1000)));
     try(Connection con = DB.sql2o.open()) {
       String sql1 = "UPDATE books SET patronId = :patronId, checkoutDate = now() WHERE id = :id";
       String sql2 = "UPDATE books SET dueDate = (checkoutDate + INTERVAL '60 days') WHERE id = :id";

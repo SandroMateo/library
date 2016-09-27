@@ -1,4 +1,6 @@
 import java.text.DateFormat;
+import java.sql.Timestamp;
+import java.util.Date;
 import org.sql2o.*;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -45,27 +47,23 @@ public class BookTest {
   }
 
   @Test
+  public void getDueDate_returnsDueDate_String() {
+    firstPatron.save();
+    firstBook.checkout(firstPatron.getId());
+    Timestamp rightNow = new Timestamp(new Date().getTime());
+    assertEquals(rightNow.setTime(rightNow.getTime() + (60 * 24 * 60 * 1000)), firstBook.getDueDate().getDay());
+  }
+
+  @Test
+  public void getRenewals_returnsrenewals_int() {
+    firstBook.save();
+    assertEquals(0, firstBook.getRenewals());
+  }
+
+  @Test
   public void getId_returnsId_true() {
     firstBook.save();
     assertTrue(firstBook.getId() > 0);
-  }
-
-  @Test
-  public void getCheckedBooks_returnsCheckedBooks_int() {
-    assertEquals(0, firstBook.getCheckedBooks());
-  }
-
-  @Test
-  public void getBooks_returnListOfBooks_True() {
-    firstBook.save();
-    Book firstBook = new Book("Moby Dick", "Melville");
-    firstBook.save();
-    firstBook.checkout(firstBook.getId());
-    Book secondBook = new Book("Dreams from my Father", "Barrack Obama");
-    secondBook.save();
-    secondBook.checkout(firstBook.getId());
-    assertTrue(firstBook.getBooks().contains(firstBook));
-    assertTrue(firstBook.getBooks().contains(secondBook));
   }
 
   @Test
@@ -85,7 +83,7 @@ public class BookTest {
 
   @Test
   public void equals_returnsTrueIfNamesAreTheSame() {
-    Book myBook = new Book("seashells33", "elvis55", "Myrtle");
+    Book myBook = new Book("Moby Dick", "Melville");
     assertTrue(firstBook.equals(myBook));
   }
 
@@ -103,24 +101,17 @@ public class BookTest {
   }
 
   @Test
-  public void updateName_updatesBookName_true() {
+  public void updateTitle_updatesBookTitle_true() {
     firstBook.save();
-    firstBook.updateName("Myrtle Fitzgerald");
-    assertEquals("Myrtle Fitzgerald", Book.find(firstBook.getId()).getName());
+    firstBook.updateTitle("Moby Dick");
+    assertEquals("Moby Dick", Book.find(firstBook.getId()).getTitle());
   }
 
   @Test
-  public void updateUsername_updatesBookUsername_true() {
+  public void updateAuthor_updatesBookAuthor_true() {
     firstBook.save();
-    firstBook.updateUsername("seashells88");
-    assertEquals("seashells88", Book.find(firstBook.getId()).getUsername());
-  }
-
-  @Test
-  public void updatePassword_updatesBookPassword_true() {
-    firstBook.save();
-    firstBook.updatePassword("belieber16");
-    assertEquals("belieber16", Book.find(firstBook.getId()).getPassword());
+    firstBook.updateAuthor("Melville");
+    assertEquals("Melville", Book.find(firstBook.getId()).getAuthor());
   }
 
   @Test
@@ -133,18 +124,21 @@ public class BookTest {
 
 
   @Test
-  public void checkoutBook_increasesCount_int(){
+  public void checkout_updatesPatronId_int(){
     firstBook.save();
-    firstBook.checkoutBook();
-    assertEquals(1, Book.find(firstBook.getId()).getCheckedBooks());
+    firstPatron.save();
+    firstBook.checkout(firstPatron.getId());
+    assertEquals(firstPatron.getId(), Book.find(firstBook.getPatronId()));
   }
 
   @Test
-  public void returnBook_lowersCount_int(){
+  public void returnThisBook_updatesPatronIdAndRenewals_int(){
     firstBook.save();
-    firstBook.checkoutBook();
-    firstBook.returnBook();
-    assertEquals(0, Book.find(firstBook.getId()).getCheckedBooks());
+    firstPatron.save();
+    firstBook.checkout(firstPatron.getId());
+    firstBook.returnThisBook();
+    assertEquals(0, Book.find(firstBook.getId()).getPatronId());
+    assertEquals(0, Book.find(firstBook.getId()).getRenewals());
   }
 
 }

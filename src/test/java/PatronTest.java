@@ -63,6 +63,19 @@ public class PatronTest {
   }
 
   @Test
+  public void getBookHistory_returnListOfBooks_True() {
+    firstPatron.save();
+    Book firstBook = new Book("Moby Dick", "Melville");
+    firstBook.save();
+    firstBook.checkout(firstPatron.getId());
+    Book secondBook = new Book("Dreams from my Father", "Barack Obama");
+    secondBook.save();
+    secondBook.checkout(firstPatron.getId());
+    assertTrue(firstPatron.getBookHistory().contains(firstBook));
+    assertTrue(firstPatron.getBookHistory().contains(secondBook));
+  }
+
+  @Test
   public void all_returnsAllInstancesOfPatron_true() {
     firstPatron.save();
     secondPatron.save();
