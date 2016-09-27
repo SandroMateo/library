@@ -1,0 +1,26 @@
+<form action="/new-account" method="post" class="login" id="new-login">
+  <label for="username">username:</label>
+  #if($usernameTaken)
+    <p class="wrong">Username already taken!</p>
+  #end
+  <input type="text" name="username" placeholder="username" class="form-control" required>
+
+  <label for="password">password:</label>
+  <input type="password" name="password" placeholder="password" class="form-control" required>
+
+  <label for="password">name:</label>
+  <input type="text" name="name" placeholder="name" class="form-control" required>
+
+  <div class="radio">
+    <label for="librarian">
+      <input type="radio" name="librarian" value="true">
+      Librarian
+    </label>
+    <label for="librarian">
+      <input type="radio" name="librarian" value="false">
+      Patron
+    </label>
+  </div>
+
+  <button type="submit" class="btn btn-success pull-right">Login</button>
+</form>

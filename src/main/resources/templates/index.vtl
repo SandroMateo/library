@@ -1,0 +1,14 @@
+<form action="/login" method="post" class="login">
+  <label for="username">username:</label>
+  #if($wrongUsername)
+    <p class="wrong">Invalid Username</p>
+  #end
+  <input type="text" name="username" placeholder="username" class="form-control" required>
+  <label for="password">password:</label>
+  #if($wrongPassword)
+    <p class="wrong">Invalid Password</p>
+  #end
+  <input type="password" name="password" placeholder="password" class="form-control" required>
+  <a href="/create-account">Create Account</a>
+  <button type="submit" class="btn btn-success pull-right">Login</button>
+</form>

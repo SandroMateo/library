@@ -1,0 +1,34 @@
+<h1>Welcome $patron.getName(), To The Great Library of Alexandria</h1>
+
+#if($patron.getBooks().size() > 0)
+  <h3>Books</h3>
+  <ul>
+    #foreach($book in $patron.getBooks())
+      <li><a href="patron/$patron.getId()/book/$book.getId()">$book.getTitle(), By $book.getAuthor()</a></li>
+    #end
+  </ul>
+#end
+
+#if($patron.isLibrarian())
+  <h3>Add A Book!</h3>
+  <form action="book/new" method="post">
+    <label for="title">Title</label>
+    <input type="text" name="title" required>
+    <label for="author">Author</label>
+    <input type="text" name="author" required>
+    <button type="submit" class="btn btn-success">Add!</button>
+  </form>
+#end
+
+#if($books.size() > 0)
+  <div class="form-group">
+    <form action="patron/$patron.getId()/book/checkout" method="post">
+      <select name="book" class="form-control">
+        #foreach($book in $books)
+          <option value=$book.getId()>$book.getTitle(), By $book.getAuthor()</option>
+        #end
+      </select>
+      <button type="submit" class="btn btn-success">Checkout!</button>
+    </form>
+  </div>
+#end

@@ -1,0 +1,22 @@
+.login{
+  margin-top: 5em;
+  width: 20em;
+  padding: 20px;
+  padding-bottom: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: solid black 2px;
+}
+
+.pull-right {
+  margin-top: 5px;
+}
+
+.wrong {
+  color: crimson;
+}
+
+#new-login{
+  padding-bottom: 40px;
+}

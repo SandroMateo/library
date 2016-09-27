@@ -1,0 +1,11 @@
+<h1>$book.getTitle(), by $book.getAuthor()</h1>
+
+<h4>specs:</h4>
+<h2>$book.getCheckoutDate()</h2>
+<h2>$book.getDueDate()</h2>
+<h2>renewals used: $book.getRenewals()</h2>
+<form action="/patron/$book.getPatronId()/book/$book.getId()/renew" method="post">
+  <button type="submit" class="btn btn-success">Renew!</button>
+</form>
+
+<a href="/patron/$book.getPatronId()">Home</a>
