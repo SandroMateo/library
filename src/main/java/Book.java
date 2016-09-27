@@ -64,7 +64,7 @@ public class Book{
 
   public void updateTitle(String title) {
     try(Connection con = DB.sql2o.open()) {
-      String sql = "UPDATE patrons SET title = :title WHERE id = :id";
+      String sql = "UPDATE books SET title = :title WHERE id = :id";
       con.createQuery(sql)
         .addParameter("title", title)
         .addParameter("id", this.id)
@@ -74,7 +74,7 @@ public class Book{
 
   public void updateAuthor(String author) {
     try(Connection con = DB.sql2o.open()) {
-      String sql = "UPDATE patrons SET author = :author WHERE id = :id";
+      String sql = "UPDATE books SET author = :author WHERE id = :id";
       con.createQuery(sql)
         .addParameter("author", author)
         .addParameter("id", this.id)
@@ -110,10 +110,8 @@ public class Book{
 
   public void checkout(int patronId) {
     Patron.find(patronId).checkoutBook();
-    checkoutDate = new Timestamp(new Date().getTime());
-    dueDate = new Timestamp(checkoutDate.setTime(checkoutDate + (60 * 24 * 60 * 1000)));
     try(Connection con = DB.sql2o.open()) {
-      String sql1 = "UPDATE books SET patronId = :patronId, checkoutDate = now() WHERE id = :id";
+      String sql1 = "UPDATE books SET patronid = :patronId, checkoutDate = now() WHERE id = :id";
       String sql2 = "UPDATE books SET dueDate = (checkoutDate + INTERVAL '60 days') WHERE id = :id";
       String sql3 = "INSERT INTO histories (patronid, bookid) VALUES (:patronid, :id)";
       con.createQuery(sql1)
@@ -125,7 +123,7 @@ public class Book{
         .executeUpdate();
       con.createQuery(sql3)
         .addParameter("patronid", patronId)
-        .addParameter("bookid", this.id)
+        .addParameter("id", this.id)
         .executeUpdate();
     }
   }
@@ -145,7 +143,7 @@ public class Book{
   }
 
   public void returnThisBook() {
-    Patron.find(this.patronId).returnBook();
+    Patron.find(this.getPatronId()).returnBook();
     this.patronId = 0;
     this.renewals = 0;
     try(Connection con = DB.sql2o.open()) {
@@ -164,8 +162,8 @@ public class Book{
       Book newBook = (Book) otherBook;
       return this.getTitle().equals(newBook.getTitle()) &&
         this.getAuthor().equals(newBook.getAuthor()) &&
-        this.getCheckoutDate().equals(newBook.getCheckoutDate()) &&
-        this.getDueDate().equals(newBook.getDueDate()) &&
+        this.getCheckoutDate() == (newBook.getCheckoutDate()) &&
+        this.getDueDate() == (newBook.getDueDate()) &&
         this.getPatronId() == newBook.getPatronId() &&
         this.getRenewals() == newBook.getRenewals();
     }

@@ -12,12 +12,12 @@ public class Patron {
 
   public static final int MAX_CHECKED_BOOKS = 5;
 
-  public Patron(String username, String password, String name) {
+  public Patron(String username, String password, String name, boolean librarian) {
     this.username = username;
     this.password = password;
     this.name = name;
+    this.librarian = librarian;
     this.checkedBooks = 0;
-    this.librarian = false;
   }
 
   public int getId(){
@@ -148,7 +148,7 @@ public class Patron {
 
   public List<Integer> getBookHistory() {
     try(Connection con = DB.sql2o.open()) {
-      String sql = "SELECT * FROM histories WHERE patronid = :id";
+      String sql = "SELECT bookid FROM histories WHERE patronid = :id";
       return con.createQuery(sql)
         .addParameter("id", this.id)
         .executeAndFetch(Integer.class);

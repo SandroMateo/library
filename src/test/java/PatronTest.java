@@ -11,8 +11,8 @@ public class PatronTest {
 
   @Before
   public void initialize() {
-    firstPatron = new Patron("seashells33", "elvis55", "Myrtle");
-    secondPatron = new Patron("jimmybobjoe", "imhere", "Joe-Bob");
+    firstPatron = new Patron("seashells33", "elvis55", "Myrtle", false);
+    secondPatron = new Patron("jimmybobjoe", "imhere", "Joe-Bob", true);
   }
 
   @Rule
@@ -39,6 +39,11 @@ public class PatronTest {
   }
 
   @Test
+  public void isLibrarian_returnsLibrarian_boolean() {
+    assertEquals(false, firstPatron.isLibrarian());
+  }
+
+  @Test
   public void getId_returnsId_true() {
     firstPatron.save();
     assertTrue(firstPatron.getId() > 0);
@@ -58,8 +63,8 @@ public class PatronTest {
     Book secondBook = new Book("Dreams from my Father", "Barack Obama");
     secondBook.save();
     secondBook.checkout(firstPatron.getId());
-    assertTrue(firstPatron.getBooks().contains(firstBook));
-    assertTrue(firstPatron.getBooks().contains(secondBook));
+    assertEquals(firstPatron.getBooks().get(0).getId(), Book.find(firstBook.getId()).getId());
+    assertEquals(firstPatron.getBooks().get(1).getId(), Book.find(secondBook.getId()).getId());
   }
 
   @Test
@@ -71,8 +76,8 @@ public class PatronTest {
     Book secondBook = new Book("Dreams from my Father", "Barack Obama");
     secondBook.save();
     secondBook.checkout(firstPatron.getId());
-    assertTrue(firstPatron.getBookHistory().contains(firstBook));
-    assertTrue(firstPatron.getBookHistory().contains(secondBook));
+    assertTrue(firstPatron.getBookHistory().contains(firstBook.getId()));
+    assertTrue(firstPatron.getBookHistory().contains(secondBook.getId()));
   }
 
   @Test
@@ -92,7 +97,7 @@ public class PatronTest {
 
   @Test
   public void equals_returnsTrueIfNamesAreTheSame() {
-    Patron myPatron = new Patron("seashells33", "elvis55", "Myrtle");
+    Patron myPatron = new Patron("seashells33", "elvis55", "Myrtle", false);
     assertTrue(firstPatron.equals(myPatron));
   }
 
@@ -144,6 +149,24 @@ public class PatronTest {
     firstPatron.save();
     firstPatron.checkoutBook();
     assertEquals(1, Patron.find(firstPatron.getId()).getCheckedBooks());
+  }
+
+  @Test (expected = UnsupportedOperationException.class)
+  public void checkoutBook_provokesException_exception(){
+    for (int i = 0; i <=(Patron.MAX_CHECKED_BOOKS + 1); i++) {
+      firstPatron.checkoutBook();
+    }
+  }
+
+  @Test
+  public void checkoutBook_catchException_exception(){
+    for (int i = 0; i <=(Patron.MAX_CHECKED_BOOKS + 1); i++) {
+      try {
+        firstPatron.checkoutBook();
+      } catch(UnsupportedOperationException exception){}
+    }
+    assertTrue(firstPatron.getCheckedBooks()<=Patron.MAX_CHECKED_BOOKS);
+
   }
 
   @Test

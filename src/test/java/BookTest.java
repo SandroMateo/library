@@ -1,6 +1,7 @@
 import java.text.DateFormat;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Calendar;
 import org.sql2o.*;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -17,7 +18,7 @@ public class BookTest {
   public void initialize() {
     firstBook = new Book("Moby Dick", "Melville");
     secondBook = new Book("Dreams from my Father", "Barack Obama");
-    firstPatron = new Patron("seashells33", "elvis55", "Myrtle");
+    firstPatron = new Patron("seashells33", "elvis55", "Myrtle", false);
   }
 
   @Rule
@@ -41,17 +42,23 @@ public class BookTest {
   @Test
   public void getCheckoutDate_returnsCheckoutDate_String() {
     firstPatron.save();
+    firstBook.save();
     firstBook.checkout(firstPatron.getId());
     Timestamp rightNow = new Timestamp(new Date().getTime());
-    assertEquals(rightNow.getDay(), firstBook.getCheckoutDate().getDay());
+    assertEquals(rightNow.getDay(), Book.find(firstBook.getId()).getCheckoutDate().getDay());
   }
 
   @Test
   public void getDueDate_returnsDueDate_String() {
     firstPatron.save();
+    firstBook.save();
     firstBook.checkout(firstPatron.getId());
     Timestamp rightNow = new Timestamp(new Date().getTime());
-    assertEquals(rightNow.setTime(rightNow.getTime() + (60 * 24 * 60 * 1000)), firstBook.getDueDate().getDay());
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(rightNow);
+    cal.add(Calendar.DAY_OF_WEEK, 60);
+    rightNow.setTime(cal.getTime().getTime());
+    assertEquals(rightNow.getDay(), Book.find(firstBook.getId()).getDueDate().getDay());
   }
 
   @Test
@@ -128,7 +135,7 @@ public class BookTest {
     firstBook.save();
     firstPatron.save();
     firstBook.checkout(firstPatron.getId());
-    assertEquals(firstPatron.getId(), Book.find(firstBook.getPatronId()));
+    assertEquals(firstPatron.getId(), Book.find(firstBook.getId()).getPatronId());
   }
 
   @Test
@@ -136,7 +143,7 @@ public class BookTest {
     firstBook.save();
     firstPatron.save();
     firstBook.checkout(firstPatron.getId());
-    firstBook.returnThisBook();
+    Book.find(firstBook.getId()).returnThisBook();
     assertEquals(0, Book.find(firstBook.getId()).getPatronId());
     assertEquals(0, Book.find(firstBook.getId()).getRenewals());
   }
