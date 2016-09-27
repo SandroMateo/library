@@ -1,11 +1,14 @@
 import org.sql2o.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Patron {
-  private int id;
-  private String username;
-  private String password;
-  private String name;
-  private int checkedBooks;
+  public int id;
+  public String username;
+  public String password;
+  public String name;
+  public int checkedBooks;
+  public boolean librarian;
 
   public static final int MAX_CHECKED_BOOKS = 5;
 
@@ -14,6 +17,7 @@ public class Patron {
     this.password = password;
     this.name = name;
     this.checkedBooks = 0;
+    this.librarian = false;
   }
 
   public int getId(){
@@ -36,6 +40,40 @@ public class Patron {
     return checkedBooks;
   }
 
+  public boolean isLibrarian() {
+    return librarian;
+  }
+
+  public void updateName(String name) {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE patrons SET name = :name WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("name", name)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
+  public void updateUsername(String username) {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE patrons SET username = :username WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("username", username)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
+  public void updatePassword(String password) {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "UPDATE patrons SET password = :password WHERE id = :id";
+      con.createQuery(sql)
+        .addParameter("password", password)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
   public static List<Patron> all() {
     try(Connection con = DB.sql2o.open()) {
       String sql = "SELECT * FROM patrons";
@@ -54,25 +92,38 @@ public class Patron {
 
   public void save() {
     try(Connection con = DB.sql2o.open()){
-      String sql = "INSERT INTO patrons (username, password, name) VALUES(:username, :password, :name)";
+      String sql = "INSERT INTO patrons (username, password, name, librarian) VALUES(:username, :password, :name, :librarian)";
       this.id = (int) con.createQuery(sql, true)
         .addParameter("username", this.username)
         .addParameter("password", this.password)
         .addParameter("name", this.name)
+        .addParameter("librarian", this.librarian)
         .executeUpdate()
         .getKey();
     }
   }
 
-  public void updateCheckedBooks() {
+  public void checkoutBook() {
     if(checkedBooks >= Patron.MAX_CHECKED_BOOKS) {
       throw new UnsupportedOperationException("You have already checked out the max amount of books!");
     }
     this.checkedBooks++;
     try(Connection con = DB.sql2o.open()) {
-      String sql = "UPDATE patrons SET checkedBooks = :checkedBooks";
+      String sql = "UPDATE patrons SET checkedBooks = :checkedBooks WHERE id=:id";
       con.createQuery(sql)
         .addParameter("checkedBooks", this.checkedBooks)
+        .addParameter("id", this.id)
+        .executeUpdate();
+    }
+  }
+
+  public void returnBook() {
+    this.checkedBooks--;
+    try(Connection con = DB.sql2o.open()){
+      String sql = "UPDATE patrons SET checkedBooks=:checkedBooks WHERE id=:id";
+      con.createQuery(sql)
+        .addParameter("checkedBooks", this.checkedBooks)
+        .addParameter("id", this.id)
         .executeUpdate();
     }
   }
